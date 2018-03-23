@@ -7,7 +7,8 @@ pygame.font.init()
 
 size = width, height = 1000,800
 screen = pygame.display.set_mode((size))
-font = pygame.font.SysFont('Calibri', 30)
+font30 = pygame.font.SysFont('Calibri', 30)
+font20 = pygame.font.SysFont('Calibri', 20)
 
 piece_imgs = {'melee': pygame.image.load('img/melee.jpg'), 'ranged': pygame.image.load('img/ranged.jpg')}
 
@@ -40,6 +41,7 @@ class Piece:
 	def __init__(self, loc, template):
 		self.loc = loc
 		self.health = piece_types[template]['health']
+		self.max_health = piece_types[template]['health']
 		self.speed = piece_types[template]['speed']
 		self.attacks = piece_types[template]['attacks']
 		self.img = piece_imgs[template]
@@ -83,7 +85,7 @@ while not done:
 							active_piece = piece
 							active_attack = None
 							for i in range(len(active_piece.attacks)):
-								attack_text = font.render(active_piece.attacks[i], False, (255, 255, 255))
+								attack_text = font30.render(active_piece.attacks[i], False, (255, 255, 255))
 								button = pygame.Rect(board_width+10, 210*i, width-board_width-20, 100)
 								pygame.draw.rect(screen, (255, 0, 255), button)
 								text_rect = attack_text.get_rect()
@@ -116,9 +118,17 @@ while not done:
 				elif getDist(active_piece.loc, (x, y)) <= active_piece.speed and not (x is active_piece.loc[0] and y is active_piece.loc[1]):
 					pygame.draw.circle(screen, (0,0,255), (x*square_size+(square_size/2), y*square_size+(square_size/2)), square_size/2-5)
 
-	for player in players:
+	for index, player in enumerate(players):
 		for piece in player.pieces:
+			outline = pygame.Rect(piece.loc[0]*square_size+5, piece.loc[1]*square_size+5, 70, 70)
+			if(index == 0):
+				pygame.draw.rect(screen, (0,0,255), outline)
+			elif(index == 1):
+				pygame.draw.rect(screen, (0,255,0), outline)
 			screen.blit(piece.img, (piece.loc[0]*square_size+10, piece.loc[1]*square_size+10))
+			piece_health = font20.render(str(piece.health)+'/'+str(piece.max_health), False, (255, 255, 255))
+			screen.blit(piece_health, ((piece.loc[0]*square_size+10, piece.loc[1]*square_size+70)))
+
 
 	if(active_piece != None):
 		for button in attack_buttons:
