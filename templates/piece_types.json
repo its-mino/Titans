@@ -1,0 +1,13 @@
+{
+	"melee": {
+		"health": 4,
+		"speed": 3,
+		"attacks": ["sword"]
+	},
+
+	"ranged": {
+		"health": 2,
+		"speed": 2,
+		"attacks": ["bow"]
+	}
+}

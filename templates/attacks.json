@@ -1,0 +1,11 @@
+{
+	"sword": {
+		"range": 1,
+		"damage": 2
+	},
+
+	"bow": {
+		"range": 4,
+		"damage": 1
+	}
+}
