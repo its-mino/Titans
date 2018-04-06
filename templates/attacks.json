@@ -1,11 +1,22 @@
 {
-	"sword": {
+
+	"Dagger": {
 		"range": 1,
+		"damage": 3
+	},
+
+	"Bow": {
+		"range": 5,
 		"damage": 2
 	},
 
-	"bow": {
-		"range": 4,
-		"damage": 1
+	"Sword": {
+		"range": 1,
+		"damage": 3
+	},
+
+	"Axe": {
+		"range": 1,
+		"damage": 4
 	}
 }

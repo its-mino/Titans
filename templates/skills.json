@@ -1,0 +1,259 @@
+{
+	"Blink": {
+		"range": 2,
+		"cooldown": 3,
+		"targets": "ground",
+		"duration": 0,
+		"attack": false,
+		"effects": {"move": "ignore"}
+	},
+
+	"Invisibility": {
+		"range": 0,
+		"cooldown": 3,
+		"targets": "self",
+		"duration": 2,
+		"attack": false,
+		"effects": {"targetable": false}
+	},
+
+	"Dash": {
+		"range": 0,
+		"cooldown": 2,
+		"targets": "self",
+		"duration": 1,
+		"attack": false,
+		"effects": {"speed": 3}
+	},
+
+	"Sharpen Arrows": {
+		"range": 0,
+		"cooldown": 5,
+		"targets": "self",
+		"duration": 3,
+		"attack": false,
+		"effects": {"damage dealt": 1, "range": 1}
+	},
+
+	"Firebolt": {
+		"range": 4,
+		"cooldown": 0,
+		"targets": "enemies",
+		"duration": 2,
+		"attack": true,
+		"effects": {"damage": 1, "dot": 1}
+	},
+
+
+	"Flare Up": {
+		"range": 4,
+		"cooldown": 4,
+		"targets": "allies",
+		"duration": 1,
+		"attack": false,
+		"effects": {"shield": 1, "speed": 1, "damage dealt": 1}
+	},
+
+	"Burnout": {
+		"range": 3,
+		"cooldown": 2,
+		"targets": "enemies",
+		"duration": 0,
+		"attack": true,
+		"effects": {"durations": "damage"}
+	},
+
+	"Shock": {
+		"range": 2,
+		"cooldown": 0,
+		"targets": "self",
+		"duration": 0,
+		"attack": true,
+		"effects": {"damage": 2}
+	},
+
+	"Tempest": {
+		"range": 4,
+		"cooldown": 1,
+		"targets": "self",
+		"duration": 0,
+		"attack": false,
+		"effects": {"push": -2}
+	},
+
+
+	"Wind's Blessing": {
+		"range": 3,
+		"cooldown": 2,
+		"targets": "allies",
+		"duration": 2,
+		"attack": false,
+		"effects": {"speed": 1}
+	},
+
+
+
+	"Mind Blast": {
+		"range": 4,
+		"cooldown": 0,
+		"targets": "enemies",
+		"duration": 1,
+		"attack": true,
+		"effects": {"damage": 1, "range": -2}
+	},
+
+
+	"Daze": {
+		"range": 2,
+		"cooldown": 4,
+		"targets": "enemies",
+		"duration": 1,
+		"attack": true,
+		"effects": {"can attack": false, "can move": false, "can minor": false}
+	},
+
+
+	"Swap": {
+		"range": 3,
+		"cooldown": 3,
+		"targets": "others",
+		"duration": 0,
+		"attack": false,
+		"effects": {"swap": null}
+	},
+
+
+
+	"Shatter": {
+		"range": 3,
+		"cooldown": 0,
+		"targets": "ground:1",
+		"duration": 0,
+		"attack": true,
+		"effects": {"damage": 1}
+	},
+
+
+	"Earthquake": {
+			"range": 3,
+			"cooldown": 2,
+			"targets": "self",
+			"duration": 2,
+			"attack": true,
+			"effects": {"damage": 1, "speed": -1}
+	},
+
+
+	"Root": {
+		"range": 5,
+		"cooldown": 3,
+		"targets": "enemies",
+		"duration": 1,
+		"attack": false,
+		"effects": {"can move": false}
+	},
+
+
+
+	"Holy Strength": {
+		"range": 3, 
+		"cooldown": 0,
+		"targets": "allies",
+		"duration": 1,
+		"attack": true,
+		"effects": {"damage dealt": 1}
+	},
+
+
+	"Healing Word": {
+		"range": 3,
+		"cooldown": 1,
+		"targets": "allies",
+		"duration": 0,
+		"attack": true,
+		"effects": {"damage": -2}
+	},
+
+
+	"Dispel Magic": {
+		"range": 2,
+		"cooldown": 3,
+		"targets": "any",
+		"duration": 0,
+		"attack": true,
+		"effects": {"dispel": 0}
+	},
+
+
+
+	"Water Whip": {
+		"range": 3,
+		"cooldown": 0,
+		"targets": "enemies",
+		"duration": 1,
+		"attack": true,
+		"effects": {"damage": 1, "speed": -1}
+	},
+
+
+	"Healing Song": {
+		"range": 4,
+		"cooldown": 3,
+		"targets": "allies",
+		"duration": 3,
+		"attack": false,
+		"effects": {"dot": -1}
+	},
+
+
+	"Shield": {
+		"range": 3,
+		"cooldown": 2,
+		"targets": "allies",
+		"duration": 1,
+		"attack": false,
+		"effects": {"shield": 2}
+	},
+
+
+
+	"Shield Bash": {
+		"range": 1,
+		"cooldown": 2,
+		"targets": "enemies",
+		"duration": 1,
+		"attack": true,
+		"effects": {"damage": 1, "can attack": false}
+	},
+
+
+	"Fighting Spirit": {
+		"range": 0,
+		"cooldown": 3,
+		"targets": "self",
+		"duration": 0,
+		"attack": false,
+		"effects": {"damage": -2}
+	},
+
+
+
+	"Whirlwind": {
+		"range": 1,
+		"cooldown": 2,
+		"targets": "self",
+		"duration": 0,
+		"attack": true,
+		"effects": {"damage": 3}
+	},
+
+
+	"Shove": {
+		"range": 1,
+		"cooldown": 1,
+		"targets": "enemies",
+		"duration": 0,
+		"attack": true,
+		"effects": {"push": 2}
+	}
+}
