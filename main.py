@@ -14,7 +14,7 @@ font40 = pygame.font.SysFont('Calibri', 40)
 font30 = pygame.font.SysFont('Calibri', 30)
 font20 = pygame.font.SysFont('Calibri', 20)
 
-piece_imgs = {'Stone Evoker': pygame.image.load('img/Stone Evoker.jpg'), 'Archer': pygame.image.load('img/Archer.jpg')}
+piece_imgs = {'Brute': pygame.image.load('img/Mesmer.jpg'), 'Archer': pygame.image.load('img/Archer.jpg')}
 
 piece_types = json.load(open('templates/piece_types.json'))
 abilities = {}
@@ -24,6 +24,7 @@ active_ability = None
 ability_type = ''
 ability_buttons = []
 cooldown_covers = {}
+use_covers = []
 
 end_button = pygame.Rect(board_width+10, height-100, width-board_width-20, 100)
 end_text = font30.render("End Turn", False, (0, 0, 0))
@@ -32,7 +33,6 @@ end_text_rect.center = end_button.center
 
 square_size = board_width/10
 
-turn = 0
 side = 0
 active_piece = None
 active_player = None
@@ -92,6 +92,8 @@ def handleEffect(effect, value, target, duration):
 		effects.damage(value, active_piece, target)
 	if effect == 'dot':
 		effects.dot(value, target, duration)
+	if effect == 'hot':
+		effects.hot(value, target, duration)
 	if effect == 'shield':
 		effects.shield(value, target)
 	if effect == 'durations':
@@ -193,6 +195,22 @@ def handleSkill(skill_name, click_loc):
 		if not hit:
 			used = False
 
+	if skill['targets'] == 'any':
+		hit = False
+		for player in players:
+			for num, piece in player.pieces.iteritems():
+				if active_piece.range_bonus is not 0:
+					rt = skill['range'] + active_piece.range_bonus
+					r = rt if rt > 0 else 1
+				else:
+					r = skill['range']
+				if getDist(click_loc, piece.loc) <= 0 and getDist(active_piece.loc, piece.loc) <= r:
+					hit = True
+					for effect, value in skill['effects'].iteritems():
+						handleEffect(effect, value, piece, skill['duration'])
+		if not hit:
+			used = False
+
 	if used:
 		if skill['attack']:
 			active_piece.has_attacked = True
@@ -210,9 +228,9 @@ def handleSkill(skill_name, click_loc):
 				text = font40.render(str(active_piece.effects['skill_'+skill_name]), False, (0, 0, 0))
 				text_rect = text.get_rect()
 				text_rect.center = cover.center
-		if str(side)+str(turn) not in cooldown_covers:
-			cooldown_covers[str(side)+str(turn)] = []
-		cooldown_covers[str(side)+str(turn)].append(['skill_'+skill_name, cover, text_rect, text])
+		if str(side)+str(active_player.piece) not in cooldown_covers:
+			cooldown_covers[str(side)+str(active_player.piece)] = []
+		cooldown_covers[str(side)+str(active_player.piece)].append(['skill_'+skill_name, cover, text_rect, text])
 
 		active_ability = None
 		ability_type = ''
@@ -227,6 +245,9 @@ def getPieceButtons(piece):
 		text_rect = attack_text.get_rect()
 		text_rect.center = button.center
 		ability_buttons.append((attack_text, piece.attacks[i], button, text_rect, 'attack'))
+
+		button = pygame.Rect(board_width+10, 210*i, width-board_width-20, 100)
+		use_covers.append((button, 'attack'))
 	offset = len(ability_buttons)
 	for i in range(len(piece.skills)):
 		skill_text = font30.render(piece.skills[i], False, (255, 255, 255))
@@ -234,10 +255,18 @@ def getPieceButtons(piece):
 		text_rect = skill_text.get_rect()
 		text_rect.center = button.center
 		ability_buttons.append((skill_text, piece.skills[i], button, text_rect, 'skill'))
-	return ability_buttons
+
+		if abilities['skill'][piece.skills[i]]['attack']:
+			button = pygame.Rect(board_width+10, 210*(i+offset), width-board_width-20, 100)
+			use_covers.append((button, 'attack'))
+		else:
+			button = pygame.Rect(board_width+10, 210*(i+offset), width-board_width-20, 100)
+			use_covers.append((button, 'minor'))
+		
+	return ability_buttons, use_covers
 
 def endTurn():
-	global turn, side, active_player, active_piece, active_ability, ability_type, ability_buttons
+	global side, active_player, active_piece, active_ability, ability_type, ability_buttons
 	active_ability = None
 	ability_type = ''
 	ability_buttons = []
@@ -248,21 +277,26 @@ def endTurn():
 	for effect, duration in active_piece.effects.iteritems():
 		temp[effect] -= 1
 		if 'skill_' in effect:
-			covers = cooldown_covers[str(side)+str(turn)]
+			covers = cooldown_covers[str(side)+str(active_player.piece)]
 			for index, cover in enumerate(covers):
 				if cover[0] == effect:
 					text = font40.render(str(temp[effect]), False, (0, 0, 0))
 					text_rect = text.get_rect()
 					text_rect.center = cover[1].center
-					cooldown_covers[str(side)+str(turn)][index] = [cover[0], cover[1], text_rect, text]
+					cooldown_covers[str(side)+str(active_player.piece)][index] = [cover[0], cover[1], text_rect, text]
 		elif 'dot:' in effect:
 			active_piece.health -= int(effect.split(":")[1])
 			if active_piece.health <= 0:
 				active_piece.dead = True
 
+		elif 'hot:' in effect:
+			active_piece.health += int(effect.split(":")[1])
+			if active_piece.health > active_piece.max_health:
+				active_piece.health = active_piece.max_health
+
 		if 'skill_' in effect and temp[effect] <= 0:
 			temp.pop(effect)
-			covers = cooldown_covers[str(side)+str(turn)]
+			covers = cooldown_covers[str(side)+str(active_player.piece)]
 			for index, cover in enumerate(covers):
 				if cover[0] == effect:
 					covers.pop(index)
@@ -275,7 +309,7 @@ def endTurn():
 			elif effect == 'range':
 				setattr(active_piece, 'range_bonus', 0)
 				temp.pop(effect)
-			elif 'damage dealt:' in effect or 'damage taken:' in effect or 'dot:' in effect:
+			elif 'damage dealt:' in effect or 'damage taken:' in effect or 'dot:' in effect or 'hot' in effect:
 				temp.pop(effect)
 			else:
 				setattr(active_piece, effect, piece_types[active_piece.template][effect])
@@ -296,18 +330,27 @@ def endTurn():
 	print 'Player ' + str(side) + '\'s Turn, using piece ' + str(active_player.piece)
 	active_piece = active_player.pieces[str(active_player.piece)]
 	active_piece.shield = 0
-	ability_buttons = getPieceButtons(active_piece)
+	ability_buttons, use_covers = getPieceButtons(active_piece)
+
+def checkWin():
+	for player in players:
+		allDead = True
+		for num, piece in player.pieces.iteritems():
+			if not piece.dead:
+				allDead = False
+		if allDead:
+			print 'Player ' + str((side+1)%len(players)) + ' has won!' 
 
 def init():
 	global players, active_player, active_piece, ability_buttons
 	players = [Player(), Player()]
-	players[0].addPieces([Piece((1,1), 'Stone Evoker')])
-	#players[0].addPieces([Piece((1,3), 'Archer')])
+	players[0].addPieces([Piece((1,1), 'Brute')])
+	players[0].addPieces([Piece((1,3), 'Archer')])
 	players[1].addPieces([Piece((1,2), 'Archer')])
 	players[1].addPieces([Piece((3,1), 'Archer')])
 	active_player = players[0]
 	active_piece = active_player.pieces["0"]
-	ability_buttons = getPieceButtons(active_piece)
+	ability_buttons, use_covers = getPieceButtons(active_piece)
 	print 'Player 0\'s Turn, using piece 0'	
 
 
@@ -315,6 +358,8 @@ init()
 
 done = False
 while not done:
+	checkWin()
+
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			done = True
@@ -332,11 +377,10 @@ while not done:
 						active_ability = None
 						ability_type = ''
 					else:
-						DONT LET THEM HIT THE BUTTON IF THEY CANT DO THE THING
-						if button[4] == 'attack':
+						if button[4] == 'attack' and active_piece.can_attack:
 							active_ability = button[1]
 							ability_type = 'attack'
-						elif button[4] == 'skill' and "skill_"+button[1] not in active_piece.effects:
+						elif button[4] == 'skill' and "skill_"+button[1] not in active_piece.effects and ((abilities['skill'][button[1]]['attack'] and active_piece.can_attack) or (not abilities['skill'][button[1]]['attack'] and active_piece.can_minor)):
 							active_ability = button[1]
 							ability_type = 'skill'
 					button_clicked = True
@@ -437,14 +481,23 @@ while not done:
 					screen.blit(piece_shield, ((piece.loc[0]*square_size+60, piece.loc[1]*square_size+70)))
 
 	
+
 	for button in ability_buttons:
 		if button[4] == 'attack':
 			pygame.draw.rect(screen, (255, 0, 255), button[2])
 		elif button[4] == 'skill':
 			pygame.draw.rect(screen, (150, 255, 0), button[2])
 		screen.blit(button[0], button[3])
+
+	for cover in use_covers:
+		if (cover[1] == 'attack' and (not active_piece.can_attack or active_piece.has_attacked) or (cover[1] == 'minor' and (not active_piece.can_minor or active_piece.has_minored))):
+			cover_surface = pygame.Surface(cover[0].size)
+			cover_surface.fill((0,0,0))
+			cover_surface.set_alpha(50)
+			screen.blit(cover_surface, (cover[0].topleft))
+
 	for piece_string, covers in cooldown_covers.iteritems():
-		s = str(side)+str(turn)
+		s = str(side)+str(active_player.piece)
 		if piece_string == s:
 			if len(covers) > 0:
 				for cover in covers:

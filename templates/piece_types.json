@@ -45,7 +45,7 @@
 		"health": 4,
 		"speed": 2,
 		"attacks": [],
-		"skills": ["Holy Strength", "Heal", "Dispel Magic"]
+		"skills": ["Holy Strength", "Healing Word", "Dispel Magic"]
 	},
 
 	"Water Mystic": {

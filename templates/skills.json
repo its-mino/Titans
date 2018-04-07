@@ -181,7 +181,7 @@
 		"targets": "any",
 		"duration": 0,
 		"attack": true,
-		"effects": {"dispel": 0}
+		"effects": {"durations": "dispel"}
 	},
 
 
@@ -202,7 +202,7 @@
 		"targets": "allies",
 		"duration": 3,
 		"attack": false,
-		"effects": {"dot": -1}
+		"effects": {"hot": 1}
 	},
 
 

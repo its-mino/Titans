@@ -1,3 +1,5 @@
+import copy
+
 def isTaken(square, players):
 	for player in players:
 		for num, piece in player.pieces.iteritems():
@@ -68,9 +70,14 @@ def damage(value, user, target):
 				target.health -= int(effect.split(':')[1])
 	if target.health <= 0:
 		target.dead = True
+	if target.health > target.max_health:
+		target.health = target.max_health
 
 def dot(value, target, duration):
 	target.effects['dot:'+str(value)] = duration
+
+def hot(value, target, duration):
+	target.effects['hot:'+str(value)] = duration
 
 def shield(value, target):
 	target.shield = value
@@ -106,6 +113,13 @@ def durations(value, user, target):
 					target.health -= int(effect.split(':')[1])	
 		if target.health <= 0:
 			target.dead = True
+	
+	if value == 'dispel':
+		temp = copy.deepcopy(target.effects)
+		for effect, value in target.effects.iteritems():
+			if not 'skill_' in effect:
+				temp.pop(effect)
+		target.effects = temp
 
 def damageTaken(value, user, target, duration):
 	target.effects['damage taken:'+str(value)] = duration
