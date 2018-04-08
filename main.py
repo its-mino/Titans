@@ -14,7 +14,7 @@ font40 = pygame.font.SysFont('Calibri', 40)
 font30 = pygame.font.SysFont('Calibri', 30)
 font20 = pygame.font.SysFont('Calibri', 20)
 
-piece_imgs = {'Brute': pygame.image.load('img/Mesmer.jpg'), 'Archer': pygame.image.load('img/Archer.jpg')}
+piece_imgs = {'Assassin': pygame.image.load('img/Assassin.png'), 'Archer': pygame.image.load('img/Archer.jpg')}
 
 piece_types = json.load(open('templates/piece_types.json'))
 abilities = {}
@@ -344,10 +344,10 @@ def checkWin():
 def init():
 	global players, active_player, active_piece, ability_buttons
 	players = [Player(), Player()]
-	players[0].addPieces([Piece((1,1), 'Brute')])
-	players[0].addPieces([Piece((1,3), 'Archer')])
-	players[1].addPieces([Piece((1,2), 'Archer')])
-	players[1].addPieces([Piece((3,1), 'Archer')])
+	players[0].addPieces([Piece((1,1), 'Assassin')])
+	#players[0].addPieces([Piece((1,3), 'Archer')])
+	#players[1].addPieces([Piece((1,2), 'Archer')])
+	#players[1].addPieces([Piece((3,1), 'Archer')])
 	active_player = players[0]
 	active_piece = active_player.pieces["0"]
 	ability_buttons, use_covers = getPieceButtons(active_piece)
@@ -442,7 +442,7 @@ while not done:
 						active_piece.loc = click_loc
 						active_piece.has_moved = True
 
-	screen.fill((0,0,0))
+	screen.fill((25,25,25))
 
 	for x in range(11):
 		pygame.draw.line(screen, (255,255,255), (square_size*x,0), (square_size*x,board_height))
@@ -468,14 +468,14 @@ while not done:
 	for index, player in enumerate(players):
 		for num, piece in player.pieces.iteritems():
 			if not piece.dead:
-				outline = pygame.Rect(piece.loc[0]*square_size+13, piece.loc[1]*square_size+13, 55, 55)
+				outline = pygame.Rect(piece.loc[0]*square_size+5, piece.loc[1]*square_size+5, 10, 10)
 				if index == 0:
 					pygame.draw.rect(screen, (0,0,255), outline)
 				elif index == 1:
 					pygame.draw.rect(screen, (0,255,0), outline)
-				screen.blit(piece.img, (piece.loc[0]*square_size+18, piece.loc[1]*square_size+18))
+				screen.blit(piece.img, (piece.loc[0]*square_size, piece.loc[1]*square_size))
 				piece_health = font20.render(str(piece.health)+'/'+str(piece.max_health), False, (255, 255, 255))
-				screen.blit(piece_health, ((piece.loc[0]*square_size+10, piece.loc[1]*square_size+70)))
+				screen.blit(piece_health, ((piece.loc[0]*square_size+5, piece.loc[1]*square_size+70)))
 				if piece.shield > 0:
 					piece_shield = font20.render(str(piece.shield), False, (255, 255, 255))
 					screen.blit(piece_shield, ((piece.loc[0]*square_size+60, piece.loc[1]*square_size+70)))
