@@ -14,7 +14,7 @@ font40 = pygame.font.SysFont('Calibri', 40)
 font30 = pygame.font.SysFont('Calibri', 30)
 font20 = pygame.font.SysFont('Calibri', 20)
 
-piece_imgs = {'Assassin': pygame.image.load('img/Assassin.png'), 'Archer': pygame.image.load('img/Archer.jpg')}
+piece_imgs = {'Assassin': pygame.image.load('img/Assassin.png'), 'Archer': pygame.image.load('img/Archer.png'), 'Fire Sorcerer': pygame.image.load('img/Fire Sorcerer.png')}
 
 piece_types = json.load(open('templates/piece_types.json'))
 abilities = {}
@@ -53,7 +53,7 @@ class Player:
 		return self.pieces
 
 class Piece:
-	def __init__(self, loc, template):
+	def __init__(self, template, loc):
 		self.loc = loc
 		self.health = piece_types[template]['health']
 		self.max_health = piece_types[template]['health']
@@ -73,6 +73,9 @@ class Piece:
 		self.can_minor = True
 		self.dead = False
 		self.template = template
+
+player_0_pieces = [Piece('Assassin', (1,1)), Piece('Fire Sorcerer', (1,5))]
+player_1_pieces = [Piece('Archer', (4,1))]
 
 def handleEffect(effect, value, target, duration):
 	if effect == 'push':
@@ -344,10 +347,8 @@ def checkWin():
 def init():
 	global players, active_player, active_piece, ability_buttons
 	players = [Player(), Player()]
-	players[0].addPieces([Piece((1,1), 'Assassin')])
-	#players[0].addPieces([Piece((1,3), 'Archer')])
-	#players[1].addPieces([Piece((1,2), 'Archer')])
-	#players[1].addPieces([Piece((3,1), 'Archer')])
+	players[0].addPieces(player_0_pieces)
+	players[1].addPieces(player_1_pieces)
 	active_player = players[0]
 	active_piece = active_player.pieces["0"]
 	ability_buttons, use_covers = getPieceButtons(active_piece)
