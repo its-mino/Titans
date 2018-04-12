@@ -46,7 +46,7 @@ def damage(value, user, target):
 	if target.shield > 0:
 		d_dealt = target.shield
 		target.shield -= value
-		if target.shield <= 0 and value-d_dealth > 0:
+		if target.shield <= 0 and value-d_dealt > 0:
 			target.health -= (value - d_dealt)
 	else:
 		target.health -= value

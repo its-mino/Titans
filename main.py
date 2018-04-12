@@ -7,16 +7,26 @@ import copy
 pygame.init()
 pygame.font.init()
 
-size = width, height = 1000,800
+size = width, height = 1200,800
 board_size = board_width, board_height = 800, 800
 screen = pygame.display.set_mode((size))
 font40 = pygame.font.SysFont('Calibri', 40)
 font30 = pygame.font.SysFont('Calibri', 30)
 font20 = pygame.font.SysFont('Calibri', 20)
 
-piece_imgs = {'Assassin': pygame.image.load('img/Assassin.png'), 'Archer': pygame.image.load('img/Archer.png'), 'Fire Sorcerer': pygame.image.load('img/Fire Sorcerer.png')}
 
 piece_types = json.load(open('templates/piece_types.json'))
+piece_names = []
+for t in piece_types:
+	piece_names.append(t)
+
+piece_imgs = {}
+for piece in piece_types:
+	try:
+		piece_imgs[piece] = pygame.image.load('img/'+piece+'.png')
+	except:
+		print piece + ' picture doesn\'t exist'
+
 abilities = {}
 abilities['attack'] = json.load(open('templates/attacks.json'))
 abilities['skill'] = json.load(open('templates/skills.json'))
@@ -32,6 +42,9 @@ end_text_rect = end_text.get_rect()
 end_text_rect.center = end_button.center
 
 square_size = board_width/10
+
+player_1_pieces = [None, None, None]
+player_2_pieces = [None, None, None]
 
 side = 0
 active_piece = None
@@ -73,9 +86,6 @@ class Piece:
 		self.can_minor = True
 		self.dead = False
 		self.template = template
-
-player_0_pieces = [Piece('Assassin', (1,1)), Piece('Fire Sorcerer', (1,5))]
-player_1_pieces = [Piece('Archer', (4,1))]
 
 def handleEffect(effect, value, target, duration):
 	if effect == 'push':
@@ -244,32 +254,32 @@ def getDist(loc1, loc2):
 def getPieceButtons(piece):
 	for i in range(len(piece.attacks)):
 		attack_text = font30.render(piece.attacks[i], False, (255, 255, 255))
-		button = pygame.Rect(board_width+10, 210*i, width-board_width-20, 100)
+		button = pygame.Rect(board_width+10, 210*i, 180, 100)
 		text_rect = attack_text.get_rect()
 		text_rect.center = button.center
 		ability_buttons.append((attack_text, piece.attacks[i], button, text_rect, 'attack'))
 
-		button = pygame.Rect(board_width+10, 210*i, width-board_width-20, 100)
+		button = pygame.Rect(board_width+10, 210*i, 180, 100)
 		use_covers.append((button, 'attack'))
 	offset = len(ability_buttons)
 	for i in range(len(piece.skills)):
 		skill_text = font30.render(piece.skills[i], False, (255, 255, 255))
-		button = pygame.Rect(board_width+10, 210*(i+offset), width-board_width-20, 100)
+		button = pygame.Rect(board_width+10, 210*(i+offset), 180, 100)
 		text_rect = skill_text.get_rect()
 		text_rect.center = button.center
 		ability_buttons.append((skill_text, piece.skills[i], button, text_rect, 'skill'))
 
 		if abilities['skill'][piece.skills[i]]['attack']:
-			button = pygame.Rect(board_width+10, 210*(i+offset), width-board_width-20, 100)
+			button = pygame.Rect(board_width+10, 210*(i+offset), 180, 100)
 			use_covers.append((button, 'attack'))
 		else:
-			button = pygame.Rect(board_width+10, 210*(i+offset), width-board_width-20, 100)
+			button = pygame.Rect(board_width+10, 210*(i+offset), 180, 100)
 			use_covers.append((button, 'minor'))
 		
 	return ability_buttons, use_covers
 
 def endTurn():
-	global side, active_player, active_piece, active_ability, ability_type, ability_buttons
+	global side, active_player, active_piece, active_ability, ability_type, ability_buttons, turn
 	active_ability = None
 	ability_type = ''
 	ability_buttons = []
@@ -287,15 +297,16 @@ def endTurn():
 					text_rect = text.get_rect()
 					text_rect.center = cover[1].center
 					cooldown_covers[str(side)+str(active_player.piece)][index] = [cover[0], cover[1], text_rect, text]
-		elif 'dot:' in effect:
-			active_piece.health -= int(effect.split(":")[1])
-			if active_piece.health <= 0:
-				active_piece.dead = True
 
 		elif 'hot:' in effect:
 			active_piece.health += int(effect.split(":")[1])
 			if active_piece.health > active_piece.max_health:
 				active_piece.health = active_piece.max_health
+
+		elif 'dot:' in effect:
+			active_piece.health -= int(effect.split(":")[1])
+			if active_piece.health <= 0:
+				active_piece.dead = True
 
 		if 'skill_' in effect and temp[effect] <= 0:
 			temp.pop(effect)
@@ -320,7 +331,9 @@ def endTurn():
 
 	active_piece.effects = temp
 	side = (side+1)%len(players)
-
+	turn += 1
+	if turn > (len(player_1_pieces) + len(player_2_pieces))-1:
+		turn = 0
 	active_player = players[side]
 	active_player.piece += 1
 	if str(active_player.piece) not in active_player.pieces:
@@ -330,7 +343,6 @@ def endTurn():
 		if str(active_player.piece) not in active_player.pieces:
 			active_player.piece = 0
 
-	print 'Player ' + str(side) + '\'s Turn, using piece ' + str(active_player.piece)
 	active_piece = active_player.pieces[str(active_player.piece)]
 	active_piece.shield = 0
 	ability_buttons, use_covers = getPieceButtons(active_piece)
@@ -345,18 +357,257 @@ def checkWin():
 			print 'Player ' + str((side+1)%len(players)) + ' has won!' 
 
 def init():
-	global players, active_player, active_piece, ability_buttons
+	global players, active_player, active_piece, ability_buttons, turn
 	players = [Player(), Player()]
-	players[0].addPieces(player_0_pieces)
-	players[1].addPieces(player_1_pieces)
+	players[0].addPieces(player_1_pieces)
+	players[1].addPieces(player_2_pieces)
 	active_player = players[0]
 	active_piece = active_player.pieces["0"]
 	ability_buttons, use_covers = getPieceButtons(active_piece)
-	print 'Player 0\'s Turn, using piece 0'	
+	players[1].piece = -1
+	turn = 0
+
+def charInfo(name):
+	global side, turn
+	back_button = pygame.Rect(50,50,150,100)
+	choose_button = pygame.Rect(250,50,150,100)
+	finished = False
+	while not finished:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				finished = True
+				exit()
+			elif event.type == pygame.MOUSEBUTTONDOWN:
+				mouse_loc = mouse_x, mouse_y = pygame.mouse.get_pos()
+				if back_button.collidepoint(mouse_loc):
+					finished = True
+				if choose_button.collidepoint(mouse_loc):
+					if side == 0:
+						player_1_pieces[int(turn**1/2)] = piece_names[x]
+						side += 1
+						turn += 1
+						finished = True
+					elif side == 1:
+						player_2_pieces[int((turn-1)**1/2)] = piece_names[x]
+						side -= 1
+						turn += 1
+						finished = True
+		screen.fill((25,25,25))
+
+		char_name = font40.render(name, False, (255,255,255))
+		screen.blit(char_name, (100, 200))
+		screen.blit(piece_imgs[name], (90, 250))
+		char_health = font30.render('Health: '+str(piece_types[name]['health']), False, (255,255,255))
+		screen.blit(char_health, (200, 250))
+		char_health = font30.render('Speed: '+str(piece_types[name]['speed']), False, (255,255,255))
+		screen.blit(char_health, (200, 300))
+		attacks_label = font40.render('Attacks:', False, (255,255,255))
+		screen.blit(attacks_label, (100, 400))
+		skills_label = font40.render('Skills:', False, (255,255,255))
+		screen.blit(skills_label, (400, 200))
+		for i, attack in enumerate(piece_types[name]['attacks']):
+			attack_data = abilities['attack'][attack]
+			screen.blit(font30.render(attack, False, (255,255,255)), (100, 450 + i*100))
+			screen.blit(font30.render('Range: ' + str(attack_data['range']), False, (255,255,255)), (100, 475 + i*100))
+			screen.blit(font30.render('Damage: ' + str(attack_data['damage']), False, (255,255,255)), (100, 500 + i*100))
+
+		for i, skill in enumerate(piece_types[name]['skills']):
+			skill_data = abilities['skill'][skill]
+			screen.blit(font30.render(skill, False, (255,255,255)), (400, 250 + i*175))
+			if skill_data['attack']:
+				screen.blit(font30.render('Action Type: Attack', False, (255,255,255)), (400, 275 + i*175))
+			else:
+				screen.blit(font30.render('Action Type: Minor', False, (255,255,255)), (400, 275 + i*175))
+			screen.blit(font30.render('Cooldown: ' + str(skill_data['cooldown']), False, (255,255,255)), (400, 300 + i*175))
+			screen.blit(font30.render('Range: ' + str(skill_data['range']), False, (255,255,255)), (400, 325 + i*175))
+			screen.blit(font30.render('Description: ' + skill_data['description'][0], False, (255,255,255)), (400, 350 + i*175))
+			if len(skill_data['description']) > 1:
+				for z, string in enumerate(skill_data['description']):
+					if z != 0:
+						screen.blit(font30.render(skill_data['description'][z], False, (255,255,255)), (400, 375 + i*175))
+
+		pygame.draw.rect(screen, (255,50,50), back_button)
+		back_text = font30.render('Back', False, (255,255,255))
+		back_text_rect = back_text.get_rect()
+		back_text_rect.center = back_button.center
+		screen.blit(back_text, back_text_rect)
+
+		pygame.draw.rect(screen, (50,255,50), choose_button)
+		choose_text = font30.render('Choose', False, (255,255,255))
+		choose_text_rect = choose_text.get_rect()
+		choose_text_rect.center = choose_button.center
+		screen.blit(choose_text, choose_text_rect)
+		pygame.display.flip()
+
+#team select
+player_1_rects = [pygame.Rect(50, 200, 80, 80), pygame.Rect(50, 400, 80, 80), pygame.Rect(50, 600, 80, 80)]
+player_2_rects = [pygame.Rect(width-130, 200, 80, 80), pygame.Rect(width-130, 400, 80, 80), pygame.Rect(width-130, 600, 80, 80)]
+grid = [(325, 200), (475, 200), (625, 200), (775, 200), (325, 400), (475, 400), (625, 400), (775, 400), (475, 600), (625, 600)]
+grid_rects = []
+for square in grid:
+	grid_rects.append(pygame.Rect(square, (80,80)))
+started = False
+side = 0
+turn = 0
+while not started:
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			started = True
+			exit()
+		elif event.type == pygame.MOUSEBUTTONDOWN:
+			mouse_loc = mouse_x, mouse_y = pygame.mouse.get_pos()
+			for x, rect in enumerate(grid_rects): 
+				if rect.collidepoint(mouse_loc):
+					if piece_names[x] not in player_1_pieces and piece_names[x] not in player_2_pieces:
+						if side == 0:
+							for i, piece in enumerate(player_1_pieces):
+								if piece is None:
+									charInfo(piece_names[x])
+									break
+						elif side == 1:
+							for i, piece in enumerate(player_2_pieces):
+								if piece is None:
+									charInfo(piece_names[x])
+									break
+			if turn > 5:
+				started = True
+
+	screen.fill((25,25,25))
+
+	player_1_text = font40.render('Player 1', False, (255, 255, 255))
+	player_2_text = font40.render('Player 2', False, (255, 255, 255))
+
+	screen.blit(player_1_text, (40,100))
+	screen.blit(player_2_text, (width - 150, 100))
+
+	player_1_choose = font40.render('Player 1\'s turn to choose!', False, (255,255,255))
+	player_2_choose = font40.render('Player 2\'s turn to choose!', False, (255,255,255))
+
+	if side == 0:
+		screen.blit(player_1_choose, (400, 100))
+	elif side == 1:
+		screen.blit(player_2_choose, (400, 100))
+
+	pygame.draw.line(screen, (255,255,255), (170, 0), (170, height))
+	pygame.draw.line(screen, (255,255,255), (width-170, 0), (width-170, height))
+
+	for i, rect in enumerate(player_1_rects):
+		if player_1_pieces[i] is None:
+			pygame.draw.rect(screen, (255,255,255), rect)
+		else:
+			screen.blit(piece_imgs[player_1_pieces[i]], (rect.x, rect.y))
+	for i, rect in enumerate(player_2_rects):
+		if player_2_pieces[i] is None:
+			pygame.draw.rect(screen, (255,255,255), rect)
+		else:
+			screen.blit(piece_imgs[player_2_pieces[i]], (rect.x, rect.y))
+
+	for i, square in enumerate(grid):
+		if piece_names[i] not in player_1_pieces and piece_names[i] not in player_2_pieces:
+			screen.blit(piece_imgs[piece_names[i]], square)
+
+	pygame.display.flip()
+
+#prep
+turn = 0
+initiative_1 = []
+initiative_2 = []
+ready = False
+player_1_wait = pygame.transform.rotate(player_1_text, 90)
+player_2_wait = pygame.transform.rotate(player_2_text, 90)
+player_1_go = font40.render('Player 1', False, (0, 255, 0))
+player_1_go = pygame.transform.rotate(player_1_go, 90)
+player_2_go = font40.render('Player 2', False, (0, 255, 0))
+player_2_go = pygame.transform.rotate(player_2_go, 90)
+player_1_grid = []
+selected_piece = None
+for i, piece in enumerate(player_1_pieces):
+	player_1_grid.append(pygame.Rect(875, 200 + i * 200, 80, 80))
+player_2_grid = []
+for i, piece in enumerate(player_2_pieces):
+	player_2_grid.append(pygame.Rect(1025, 200 + i * 200, 80, 80))
+while not ready:
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			ready = True
+			exit()
+		elif event.type == pygame.MOUSEBUTTONDOWN:
+				mouse_loc = mouse_x, mouse_y = pygame.mouse.get_pos()
+				picked_piece = False
+				if turn % 2 == 0:
+					for i ,square in enumerate(player_1_grid):
+						if square.collidepoint(mouse_loc) and selected_piece is None:
+							selected_piece = (1, i, player_1_pieces[i])
+							player_1_pieces.pop(i)
+							picked_piece = True
+				else:
+					for i ,square in enumerate(player_2_grid):
+						if square.collidepoint(mouse_loc) and selected_piece is None:
+							selected_piece = (2, i, player_2_pieces[i])
+							player_2_pieces.pop(i)
+							picked_piece = True
+				if not picked_piece and mouse_x < board_width and mouse_y < board_height:
+					click_loc = click_x, click_y = mouse_x % board_width/square_size, mouse_y % board_height/square_size
+					if turn % 2 == 0:
+						if click_x <= 3 and selected_piece is not None:
+							initiative_1.append(Piece(selected_piece[2], click_loc))
+							turn += 1
+							selected_piece = None
+					else:
+						if click_x >= 6 and selected_piece is not None:
+							initiative_2.append(Piece(selected_piece[2], click_loc))
+							turn += 1
+							selected_piece = None
+					if turn == 6:
+						player_1_pieces = initiative_1
+						player_2_pieces = initiative_2
+						ready = True
+	if not ready:
+		screen.fill((25,25,25))
+
+		for x in range(11):
+			pygame.draw.line(screen, (255,255,255), (square_size*x,0), (square_size*x,board_height))
+			pygame.draw.line(screen, (255,255,255), (0,square_size*x), (board_width, square_size*x))
+
+		for piece in initiative_1:
+			outline = pygame.Rect(piece.loc[0]*square_size+5, piece.loc[1]*square_size+5, 10, 10)
+			pygame.draw.rect(screen, (0,0,255), outline)
+			screen.blit(piece.img, (piece.loc[0]*square_size, piece.loc[1]*square_size))
+
+		for piece in initiative_2:
+			outline = pygame.Rect(piece.loc[0]*square_size+5, piece.loc[1]*square_size+5, 10, 10)
+			pygame.draw.rect(screen, (0,255,0), outline)
+			screen.blit(piece.img, (piece.loc[0]*square_size, piece.loc[1]*square_size))
+
+		if turn % 2 == 0:
+			screen.blit(player_1_go, (825, 400))
+			screen.blit(player_2_wait, (1150, 400))
+		else:
+			screen.blit(player_1_wait, (825, 400))
+			screen.blit(player_2_go, (1150, 400))
+
+		for i, piece in enumerate(player_1_pieces):
+			if selected_piece != (1, i, piece):
+				screen.blit(piece_imgs[piece], player_1_grid[i])
+
+		for i, piece in enumerate(player_2_pieces):
+			if selected_piece != (2, i, piece):
+				screen.blit(piece_imgs[piece], player_2_grid[i])
+
+		cover_surface = pygame.Surface((board_width*6/10, board_height))
+		cover_surface.fill((255,0,0))
+		cover_surface.set_alpha(50)
+		if turn % 2 == 0:
+			screen.blit(cover_surface, (board_width*4/10, 0))
+		else:
+			screen.blit(cover_surface, (0, 0))
+
+		pygame.display.flip()
 
 
 init()
 
+#game
 done = False
 while not done:
 	checkWin()
@@ -364,6 +615,7 @@ while not done:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			done = True
+			exit()
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			move = True
 			mouse_loc = mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -418,6 +670,9 @@ while not done:
 												piece.health -= (int(effect.split(':')[1]) - d_dealt)
 										else:
 											piece.health -= int(effect.split(':')[1])
+								if "effects" in abilities['attack'][active_ability]:
+									for effect, value in abilities['attack'][active_ability]['effects'].iteritems():
+										handleEffect(effect, value, piece, abilities['attack'][active_ability]['duration'])
 								if piece.health <= 0:
 									piece.dead = True
 								active_piece.has_attacked = True
@@ -480,9 +735,14 @@ while not done:
 				if piece.shield > 0:
 					piece_shield = font20.render(str(piece.shield), False, (255, 255, 255))
 					screen.blit(piece_shield, ((piece.loc[0]*square_size+60, piece.loc[1]*square_size+70)))
+				n = 0
+				for effect, value in piece.effects.iteritems():
+					if 'skill_' not in effect:
+						screen.blit(font20.render(effect + ' ' + str(value), False, (255,255,255)), (piece.loc[0]*square_size, (piece.loc[1]*square_size)+10+(10*n)))
+						n += 1
+
 
 	
-
 	for button in ability_buttons:
 		if button[4] == 'attack':
 			pygame.draw.rect(screen, (255, 0, 255), button[2])
@@ -494,7 +754,7 @@ while not done:
 		if (cover[1] == 'attack' and (not active_piece.can_attack or active_piece.has_attacked) or (cover[1] == 'minor' and (not active_piece.can_minor or active_piece.has_minored))):
 			cover_surface = pygame.Surface(cover[0].size)
 			cover_surface.fill((0,0,0))
-			cover_surface.set_alpha(50)
+			#cover_surface.set_alpha(50)
 			screen.blit(cover_surface, (cover[0].topleft))
 
 	for piece_string, covers in cooldown_covers.iteritems():
@@ -507,7 +767,14 @@ while not done:
 					cover_surface.set_alpha(50)
 					screen.blit(cover_surface, (cover[1].topleft))
 					screen.blit(cover[3], cover[2])
-				
+		
+	for i in range(6):
+		if i % 2 == 0:
+			screen.blit(player_1_pieces[int(i**1/2)].img, (1100, 100 + 100 * i))
+		else:
+			screen.blit(player_2_pieces[int((i-1)**1/2)].img, (1100, 100 + 100 * i))	
+
+	pygame.draw.polygon(screen, (255,0,0), [(1070, 130 + 100*turn), (1070, 150+100*turn), (1090, 140+100*turn)])	
 
 	pygame.draw.rect(screen, (255,255,255), end_button)
 	screen.blit(end_text, end_text_rect)

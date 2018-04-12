@@ -18,5 +18,12 @@
 	"Greataxe": {
 		"range": 1,
 		"damage": 4
+	},
+
+	"Mind Staff": {
+		"range": 2,
+		"damage": 2,
+		"duration": 1,
+		"effects": {"range": -2}
 	}
 }

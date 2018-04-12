@@ -27,11 +27,11 @@
 		"skills": ["Shock", "Tempest", "Wind's Blessing"]
 	},
 
-	"Mesmer": {
-		"health": 4,
-		"speed": 2,
-		"attacks": [],
-		"skills": ["Mind Blast", "Daze", "Swap"]
+	"Melee Mesmer": {
+		"health": 8,
+		"speed": 3,
+		"attacks": ["Mind Staff"],
+		"skills": ["Daze", "Swap"]
 	},
 
 	"Stone Evoker": {
@@ -56,15 +56,15 @@
 	},
 
 	"Knight": {
-		"health": 8,
+		"health": 10,
 		"speed": 3,
 		"attacks": ["Sword"],
 		"skills": ["Shield Bash", "Fighting Spirit"]
 	},
 
 	"Brute": {
-		"health": 10,
-		"speed": 4,
+		"health": 8,
+		"speed": 3,
 		"attacks": ["Greataxe"],
 		"skills": ["Whirlwind", "Shove"]
 	}

@@ -5,7 +5,8 @@
 		"targets": "ground",
 		"duration": 0,
 		"attack": false,
-		"effects": {"move": "ignore"}
+		"effects": {"move": "ignore"},
+		"description": ["Teleport 2 squares in any direction."]
 	},
 
 	"Invisibility": {
@@ -14,7 +15,8 @@
 		"targets": "self",
 		"duration": 2,
 		"attack": false,
-		"effects": {"targetable": false}
+		"effects": {"targetable": false},
+		"description": ["Become untargetable for 1 turn."]
 	},
 
 	"Dash": {
@@ -23,7 +25,8 @@
 		"targets": "self",
 		"duration": 1,
 		"attack": false,
-		"effects": {"speed": 3}
+		"effects": {"speed": 3},
+		"description": ["Increase your speed by 3 for 1 turn."]
 	},
 
 	"Sharpen Arrows": {
@@ -32,7 +35,8 @@
 		"targets": "self",
 		"duration": 3,
 		"attack": false,
-		"effects": {"damage dealt": 1, "range": 1}
+		"effects": {"damage dealt": 1, "range": 1},
+		"description": ["Increase the damage and range of your arrows by one each for 3 turns."]
 	},
 
 	"Firebolt": {
@@ -41,7 +45,8 @@
 		"targets": "enemies",
 		"duration": 2,
 		"attack": true,
-		"effects": {"damage": 1, "dot": 1}
+		"effects": {"damage": 1, "dot": 1},
+		"description": ["Deal one damage to an enemy and burn them, causing", "them to take an additional damage at the end of their next two turns."]
 	},
 
 
@@ -51,7 +56,8 @@
 		"targets": "allies",
 		"duration": 1,
 		"attack": false,
-		"effects": {"shield": 1, "speed": 1, "damage dealt": 1}
+		"effects": {"shield": 1, "speed": 1, "damage dealt": 1},
+		"description": ["You or an ally increase your speed", "and damage dealt by 1 for 1 turn, and gain 1 shield."]
 	},
 
 	"Burnout": {
@@ -60,7 +66,8 @@
 		"targets": "enemies",
 		"duration": 0,
 		"attack": true,
-		"effects": {"durations": "damage"}
+		"effects": {"durations": "damage"},
+		"description": ["Deal one damage to an enemy for each", "buff or debuff that is active on them."]
 	},
 
 	"Shock": {
@@ -69,7 +76,8 @@
 		"targets": "self",
 		"duration": 0,
 		"attack": true,
-		"effects": {"damage": 2}
+		"effects": {"damage": 2},
+		"description": ["Deal two damage to everyone within range around you."]
 	},
 
 	"Tempest": {
@@ -78,7 +86,8 @@
 		"targets": "self",
 		"duration": 0,
 		"attack": false,
-		"effects": {"push": -2}
+		"effects": {"push": -2},
+		"description": ["Pull everyone in range 2 squares closer to you."]
 	},
 
 
@@ -88,7 +97,8 @@
 		"targets": "allies",
 		"duration": 2,
 		"attack": false,
-		"effects": {"speed": 1}
+		"effects": {"speed": 1},
+		"description": ["Increase the speed of you or an ally by 1 for 2 turns."]
 	},
 
 
@@ -99,7 +109,8 @@
 		"targets": "enemies",
 		"duration": 1,
 		"attack": true,
-		"effects": {"damage": 1, "range": -2}
+		"effects": {"damage": 1, "range": -2},
+		"description": ["Deal 1 damage to an enemy and reduce", "their range by 2 for 1 turn."]
 	},
 
 
@@ -109,7 +120,8 @@
 		"targets": "enemies",
 		"duration": 1,
 		"attack": true,
-		"effects": {"can attack": false, "can move": false, "can minor": false}
+		"effects": {"can attack": false, "can move": false, "can minor": false},
+		"description": ["Stop an enemy from taking any", "actions for 1 turn."]
 	},
 
 
@@ -119,7 +131,8 @@
 		"targets": "others",
 		"duration": 0,
 		"attack": false,
-		"effects": {"swap": null}
+		"effects": {"swap": null},
+		"description": ["Swap places with the target."]
 	},
 
 
@@ -130,7 +143,8 @@
 		"targets": "ground:1",
 		"duration": 0,
 		"attack": true,
-		"effects": {"damage": 1}
+		"effects": {"damage": 1},
+		"description": ["Deal 1 damage to each target in a 3x3 square", "around the target square."]
 	},
 
 
@@ -140,7 +154,8 @@
 			"targets": "self",
 			"duration": 2,
 			"attack": true,
-			"effects": {"damage": 1, "speed": -1}
+			"effects": {"damage": 1, "speed": -1},
+			"description": ["Deal 1 damage to each enemy around you in", "range and reduce their speeds by 1 for 2 turns."]
 	},
 
 
@@ -150,7 +165,8 @@
 		"targets": "enemies",
 		"duration": 1,
 		"attack": false,
-		"effects": {"can move": false}
+		"effects": {"can move": false},
+		"description": ["Stop an enemy from moving for 1 turn."]
 	},
 
 
@@ -161,7 +177,8 @@
 		"targets": "allies",
 		"duration": 1,
 		"attack": true,
-		"effects": {"damage dealt": 1}
+		"effects": {"damage dealt": 1},
+		"description": ["Increase the damage an ally would do on their next turn by 1."]
 	},
 
 
@@ -171,7 +188,8 @@
 		"targets": "allies",
 		"duration": 0,
 		"attack": true,
-		"effects": {"damage": -2}
+		"effects": {"damage": -3},
+		"description": ["Heal you or an ally for 3."]
 	},
 
 
@@ -181,7 +199,8 @@
 		"targets": "any",
 		"duration": 0,
 		"attack": true,
-		"effects": {"durations": "dispel"}
+		"effects": {"durations": "dispel"},
+		"description": ["Remove all active buffs and debuffs on the target."]
 	},
 
 
@@ -192,7 +211,8 @@
 		"targets": "enemies",
 		"duration": 1,
 		"attack": true,
-		"effects": {"damage": 1, "speed": -1}
+		"effects": {"damage": 1, "speed": -1},
+		"description": ["Deal 1 damage and reduce the speed of", "the target by 1 for 1 turn."]
 	},
 
 
@@ -202,7 +222,8 @@
 		"targets": "allies",
 		"duration": 3,
 		"attack": false,
-		"effects": {"hot": 1}
+		"effects": {"hot": 1},
+		"description": ["Cause you or an ally to be healed for 1", "at the end of their next 3 turns."]
 	},
 
 
@@ -212,7 +233,8 @@
 		"targets": "allies",
 		"duration": 1,
 		"attack": false,
-		"effects": {"shield": 2}
+		"effects": {"shield": 2},
+		"description": ["Cause you or an ally to gain 2 shield."]
 	},
 
 
@@ -223,7 +245,8 @@
 		"targets": "enemies",
 		"duration": 1,
 		"attack": true,
-		"effects": {"damage": 1, "can attack": false}
+		"effects": {"damage": 1, "can attack": false},
+		"description": ["Deal 1 damage to an enemy and ", "stop them from attacking for 1 turn."]
 	},
 
 
@@ -233,7 +256,8 @@
 		"targets": "self",
 		"duration": 0,
 		"attack": false,
-		"effects": {"damage": -2}
+		"effects": {"damage": -2},
+		"description": ["Heal yourself for 2."]
 	},
 
 
@@ -244,16 +268,18 @@
 		"targets": "self",
 		"duration": 0,
 		"attack": true,
-		"effects": {"damage": 3}
+		"effects": {"damage": 3},
+		"description": ["Deal 3 damage to everyone in range around you."]
 	},
 
 
 	"Shove": {
 		"range": 1,
 		"cooldown": 1,
-		"targets": "enemies",
+		"targets": "others",
 		"duration": 0,
-		"attack": true,
-		"effects": {"push": 2}
+		"attack": false,
+		"effects": {"push": 2},
+		"description": ["Push the target 2 squares away from you."]
 	}
 }
