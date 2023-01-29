@@ -25,7 +25,7 @@ for piece in piece_types:
 	try:
 		piece_imgs[piece] = pygame.image.load('img/'+piece+'.png')
 	except:
-		print piece + ' picture doesn\'t exist'
+		print(piece + ' picture doesn\'t exist')
 
 abilities = {}
 abilities['attack'] = json.load(open('templates/attacks.json'))
@@ -41,8 +41,7 @@ end_text = font30.render("End Turn", False, (0, 0, 0))
 end_text_rect = end_text.get_rect()
 end_text_rect.center = end_button.center
 
-square_size = board_width/10
-
+square_size = int(board_width/10)
 player_1_pieces = [None, None, None]
 player_2_pieces = [None, None, None]
 
@@ -137,73 +136,73 @@ def handleSkill(skill_name, click_loc):
 					y += 1
 				x += 1
 			for player in players:
-				for num, piece in player.pieces.iteritems():
+				for num, piece in player.pieces.items():
 					for loc in locs:
 						if piece.loc == loc:
-							for effect, value in skill['effects'].iteritems():
+							for effect, value in skill['effects'].items():
 								handleEffect(effect, value, piece, skill['duration'])
 		else:
-			for effect, value in skill['effects'].iteritems():
+			for effect, value in skill['effects'].items():
 				handleEffect(effect, value, click_loc, skill['duration'])
 	if skill['targets'] == 'self':
 		if skill['range'] > 0:
 			for player in players:
-				for num, piece in player.pieces.iteritems():
+				for num, piece in player.pieces.items():
 					if piece != active_piece:
-						if active_piece.range_bonus is not 0:
+						if active_piece.range_bonus != 0:
 							rt = skill['range'] + active_piece.range_bonus
 							r = rt if rt > 0 else 1
 						else:
 							r = skill['range']
 						if getDist(active_piece.loc, piece.loc) <= r:
-							for effect, value in skill['effects'].iteritems():	
+							for effect, value in skill['effects'].items():	
 								handleEffect(effect, value, piece, skill['duration'])
 		else:	
-			for effect, value in skill['effects'].iteritems():
+			for effect, value in skill['effects'].items():
 				handleEffect(effect, value, active_piece, skill['duration'])
 	if skill['targets'] == 'enemies':
 		hit = False
 		player = players[(side+1)%len(players)]
-		for num, piece in player.pieces.iteritems():
-			if active_piece.range_bonus is not 0:
+		for num, piece in player.pieces.items():
+			if active_piece.range_bonus != 0:
 				rt = skill['range'] + active_piece.range_bonus
 				r = rt if rt > 0 else 1
 			else:
 				r = skill['range']
 			if getDist(click_loc, piece.loc) <= 0 and getDist(active_piece.loc, piece.loc) <= r:
 				hit = True
-				for effect, value in skill['effects'].iteritems():
+				for effect, value in skill['effects'].items():
 					handleEffect(effect, value, piece, skill['duration'])
 		if not hit:
 			used = False
 	if skill['targets'] == 'allies':
 		hit = False
 		player = players[side]
-		for num, piece in player.pieces.iteritems():
-			if active_piece.range_bonus is not 0:
+		for num, piece in player.pieces.items():
+			if active_piece.range_bonus != 0:
 				rt = skill['range'] + active_piece.range_bonus
 				r = rt if rt > 0 else 1
 			else:
 				r = skill['range']
 			if getDist(click_loc, piece.loc) <= 0 and getDist(active_piece.loc, piece.loc) <= r:
 				hit = True
-				for effect, value in skill['effects'].iteritems():
+				for effect, value in skill['effects'].items():
 					handleEffect(effect, value, piece, skill['duration'])
 		if not hit:
 			used = False
 	if skill['targets'] == 'others':
 		hit = False
 		for player in players:
-			for num, piece in player.pieces.iteritems():
+			for num, piece in player.pieces.items():
 				if piece is not active_piece:
-					if active_piece.range_bonus is not 0:
+					if active_piece.range_bonus != 0:
 						rt = skill['range'] + active_piece.range_bonus
 						r = rt if rt > 0 else 1
 					else:
 						r = skill['range']
 					if getDist(click_loc, piece.loc) <= 0 and getDist(active_piece.loc, piece.loc) <= r:
 						hit = True
-						for effect, value in skill['effects'].iteritems():
+						for effect, value in skill['effects'].items():
 							handleEffect(effect, value, piece, skill['duration'])
 		if not hit:
 			used = False
@@ -211,15 +210,15 @@ def handleSkill(skill_name, click_loc):
 	if skill['targets'] == 'any':
 		hit = False
 		for player in players:
-			for num, piece in player.pieces.iteritems():
-				if active_piece.range_bonus is not 0:
+			for num, piece in player.pieces.items():
+				if active_piece.range_bonus != 0:
 					rt = skill['range'] + active_piece.range_bonus
 					r = rt if rt > 0 else 1
 				else:
 					r = skill['range']
 				if getDist(click_loc, piece.loc) <= 0 and getDist(active_piece.loc, piece.loc) <= r:
 					hit = True
-					for effect, value in skill['effects'].iteritems():
+					for effect, value in skill['effects'].items():
 						handleEffect(effect, value, piece, skill['duration'])
 		if not hit:
 			used = False
@@ -287,7 +286,7 @@ def endTurn():
 	active_piece.has_moved = False
 	active_piece.has_minored = False
 	temp = copy.deepcopy(active_piece.effects)
-	for effect, duration in active_piece.effects.iteritems():
+	for effect, duration in active_piece.effects.items():
 		temp[effect] -= 1
 		if 'skill_' in effect:
 			covers = cooldown_covers[str(side)+str(active_player.piece)]
@@ -350,11 +349,11 @@ def endTurn():
 def checkWin():
 	for player in players:
 		allDead = True
-		for num, piece in player.pieces.iteritems():
+		for num, piece in player.pieces.items():
 			if not piece.dead:
 				allDead = False
 		if allDead:
-			print 'Player ' + str((side+1)%len(players)) + ' has won!' 
+			print('Player ' + str((side+1)%len(players)) + ' has won!')
 
 def init():
 	global players, active_player, active_piece, ability_buttons, turn
@@ -367,7 +366,7 @@ def init():
 	players[1].piece = -1
 	turn = 0
 
-def charInfo(name):
+def charInfo(name, hideButton = False):
 	global side, turn
 	back_button = pygame.Rect(50,50,150,100)
 	choose_button = pygame.Rect(250,50,150,100)
@@ -431,12 +430,12 @@ def charInfo(name):
 		back_text_rect = back_text.get_rect()
 		back_text_rect.center = back_button.center
 		screen.blit(back_text, back_text_rect)
-
-		pygame.draw.rect(screen, (50,255,50), choose_button)
-		choose_text = font30.render('Choose', False, (255,255,255))
-		choose_text_rect = choose_text.get_rect()
-		choose_text_rect.center = choose_button.center
-		screen.blit(choose_text, choose_text_rect)
+		if not hideButton:
+			pygame.draw.rect(screen, (50,255,50), choose_button)
+			choose_text = font30.render('Choose', False, (255,255,255))
+			choose_text_rect = choose_text.get_rect()
+			choose_text_rect.center = choose_button.center
+			screen.blit(choose_text, choose_text_rect)
 		pygame.display.flip()
 
 #team select
@@ -547,9 +546,9 @@ while not ready:
 							player_2_pieces.pop(i)
 							picked_piece = True
 				if not picked_piece and mouse_x < board_width and mouse_y < board_height:
-					click_loc = click_x, click_y = mouse_x % board_width/square_size, mouse_y % board_height/square_size
+					click_loc = click_x, click_y = int(mouse_x % board_width/square_size), int(mouse_y % board_height/square_size)
 					if turn % 2 == 0:
-						if click_x <= 3 and selected_piece is not None:
+						if click_x <= 4 and selected_piece is not None:
 							initiative_1.append(Piece(selected_piece[2], click_loc))
 							turn += 1
 							selected_piece = None
@@ -570,14 +569,14 @@ while not ready:
 			pygame.draw.line(screen, (255,255,255), (0,square_size*x), (board_width, square_size*x))
 
 		for piece in initiative_1:
-			outline = pygame.Rect(piece.loc[0]*square_size+5, piece.loc[1]*square_size+5, 10, 10)
+			outline = pygame.Rect(int(piece.loc[0])*square_size+5, int(piece.loc[1])*square_size+5, 10, 10)
 			pygame.draw.rect(screen, (0,0,255), outline)
-			screen.blit(piece.img, (piece.loc[0]*square_size, piece.loc[1]*square_size))
+			screen.blit(piece.img, (int(piece.loc[0])*square_size, int(piece.loc[1])*square_size))
 
 		for piece in initiative_2:
-			outline = pygame.Rect(piece.loc[0]*square_size+5, piece.loc[1]*square_size+5, 10, 10)
+			outline = pygame.Rect(int(piece.loc[0])*square_size+5, int(piece.loc[1])*square_size+5, 10, 10)
 			pygame.draw.rect(screen, (0,255,0), outline)
-			screen.blit(piece.img, (piece.loc[0]*square_size, piece.loc[1]*square_size))
+			screen.blit(piece.img, (int(piece.loc[0])*square_size, int(piece.loc[1])*square_size))
 
 		if turn % 2 == 0:
 			screen.blit(player_1_go, (825, 400))
@@ -594,11 +593,11 @@ while not ready:
 			if selected_piece != (2, i, piece):
 				screen.blit(piece_imgs[piece], player_2_grid[i])
 
-		cover_surface = pygame.Surface((board_width*6/10, board_height))
+		cover_surface = pygame.Surface((square_size*6, board_height))
 		cover_surface.fill((255,0,0))
 		cover_surface.set_alpha(50)
 		if turn % 2 == 0:
-			screen.blit(cover_surface, (board_width*4/10, 0))
+			screen.blit(cover_surface, (square_size*4, 0))
 		else:
 			screen.blit(cover_surface, (0, 0))
 
@@ -616,6 +615,19 @@ while not done:
 		if event.type == pygame.QUIT:
 			done = True
 			exit()
+		elif event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_1:
+				charInfo(players[0].getPieces()['0'].template, True)
+			elif event.key == pygame.K_2:
+				charInfo(players[0].getPieces()['1'].template, True)
+			elif event.key == pygame.K_3:
+				charInfo(players[0].getPieces()['2'].template, True)
+			elif event.key == pygame.K_4:
+				charInfo(players[1].getPieces()['0'].template, True)
+			elif event.key == pygame.K_5:
+				charInfo(players[1].getPieces()['1'].template, True)
+			elif event.key == pygame.K_6:
+				charInfo(players[1].getPieces()['2'].template, True)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			move = True
 			mouse_loc = mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -638,12 +650,12 @@ while not done:
 							ability_type = 'skill'
 					button_clicked = True
 			if not button_clicked:
-				click_loc = click_x, click_y = mouse_x % board_width/square_size, mouse_y % board_height/square_size
+				click_loc = click_x, click_y = int(mouse_x % board_width/square_size), int(mouse_y % board_height/square_size)
 
 				if active_ability is not None and getDist(active_piece.loc, click_loc) <= abilities[ability_type][active_ability]['range']:
 					if ability_type == 'attack' and not active_piece.has_attacked and active_piece.can_attack:
 						player = players[(side+1)%len(players)]
-						for num, piece in player.getPieces().iteritems():
+						for num, piece in player.getPieces().items():
 							if piece.loc == click_loc and piece.targetable:
 								if piece.shield > 0:
 									d_dealt = piece.shield
@@ -671,7 +683,7 @@ while not done:
 										else:
 											piece.health -= int(effect.split(':')[1])
 								if "effects" in abilities['attack'][active_ability]:
-									for effect, value in abilities['attack'][active_ability]['effects'].iteritems():
+									for effect, value in abilities['attack'][active_ability]['effects'].items():
 										handleEffect(effect, value, piece, abilities['attack'][active_ability]['duration'])
 								if piece.health <= 0:
 									piece.dead = True
@@ -682,7 +694,7 @@ while not done:
 						if (not active_piece.has_attacked and active_piece.can_attack) or (not abilities['skill'][active_ability]['attack'] and active_piece.can_minor):
 							if 'ground' not in abilities['skill'][active_ability]['targets']:
 								for player in players:
-									for num, piece in player.pieces.iteritems():
+									for num, piece in player.pieces.items():
 										if piece.loc == click_loc:	
 											if piece.targetable:
 												handleSkill(active_ability, click_loc)
@@ -691,7 +703,7 @@ while not done:
 				elif not active_piece.has_moved and active_piece.can_move and getDist(active_piece.loc, click_loc) <= active_piece.speed:
 					is_open = True
 					for player in players:
-						for num, piece in player.getPieces().iteritems():
+						for num, piece in player.getPieces().items():
 							if click_loc == piece.loc:
 								is_open = False
 					if is_open:
@@ -711,38 +723,36 @@ while not done:
 					color = (255, 0, 255)
 				elif ability_type == 'skill':
 					color = (150, 255, 0)
-				if active_piece.range_bonus is not 0:
+				if active_piece.range_bonus != 0:
 					rt = abilities[ability_type][active_ability]['range'] + active_piece.range_bonus
 					r = rt if rt > 0 else 1
 				else:
 					r = abilities[ability_type][active_ability]['range']
 				if getDist(active_piece.loc, (x, y)) <= r:
-					pygame.draw.circle(screen, color, (x*square_size+(square_size/2), y*square_size+(square_size/2)), square_size/2-5)
+					pygame.draw.circle(screen, color, (int(x*square_size+(square_size/2)), int(y*square_size+(square_size/2))), int(square_size/2-5))
 			elif not active_piece.has_moved and active_piece.can_move and getDist(active_piece.loc, (x, y)) <= active_piece.speed and not (x is active_piece.loc[0] and y is active_piece.loc[1]):
-				pygame.draw.circle(screen, (0,0,255), (x*square_size+(square_size/2), y*square_size+(square_size/2)), square_size/2-5)
+				pygame.draw.circle(screen, (0,0,255), (int(x*square_size+(square_size/2)), int(y*square_size+(square_size/2))), int(square_size/2-5))
 
 	for index, player in enumerate(players):
-		for num, piece in player.pieces.iteritems():
+		for num, piece in player.pieces.items():
 			if not piece.dead:
-				outline = pygame.Rect(piece.loc[0]*square_size+5, piece.loc[1]*square_size+5, 10, 10)
+				outline = pygame.Rect(int(piece.loc[0])*square_size+5, int(piece.loc[1])*square_size+5, 10, 10)
 				if index == 0:
 					pygame.draw.rect(screen, (0,0,255), outline)
 				elif index == 1:
 					pygame.draw.rect(screen, (0,255,0), outline)
-				screen.blit(piece.img, (piece.loc[0]*square_size, piece.loc[1]*square_size))
+				screen.blit(piece.img, (int(piece.loc[0])*square_size, int(piece.loc[1])*square_size))
 				piece_health = font20.render(str(piece.health)+'/'+str(piece.max_health), False, (255, 255, 255))
-				screen.blit(piece_health, ((piece.loc[0]*square_size+5, piece.loc[1]*square_size+70)))
+				screen.blit(piece_health, ((int(piece.loc[0])*square_size+5, int(piece.loc[1])*square_size+70)))
 				if piece.shield > 0:
 					piece_shield = font20.render(str(piece.shield), False, (255, 255, 255))
-					screen.blit(piece_shield, ((piece.loc[0]*square_size+60, piece.loc[1]*square_size+70)))
+					screen.blit(piece_shield, ((int(piece.loc[0])*square_size+60, int(piece.loc[1])*square_size+70)))
 				n = 0
-				for effect, value in piece.effects.iteritems():
+				for effect, value in piece.effects.items():
 					if 'skill_' not in effect:
-						screen.blit(font20.render(effect + ' ' + str(value), False, (255,255,255)), (piece.loc[0]*square_size, (piece.loc[1]*square_size)+10+(10*n)))
+						screen.blit(font20.render(effect + ' ' + str(value), False, (255,255,255)), (int(piece.loc[0])*square_size, (int(piece.loc[1])*square_size)+10+(10*n)))
 						n += 1
 
-
-	
 	for button in ability_buttons:
 		if button[4] == 'attack':
 			pygame.draw.rect(screen, (255, 0, 255), button[2])
@@ -757,7 +767,7 @@ while not done:
 			#cover_surface.set_alpha(50)
 			screen.blit(cover_surface, (cover[0].topleft))
 
-	for piece_string, covers in cooldown_covers.iteritems():
+	for piece_string, covers in cooldown_covers.items():
 		s = str(side)+str(active_player.piece)
 		if piece_string == s:
 			if len(covers) > 0:
